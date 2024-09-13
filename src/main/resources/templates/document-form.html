@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реквизиты входящего документа</title>
+    <style>
+        form {
+            margin: 1em;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="date"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .required::after {
+            content: " *";
+            color: red;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        function validateForm() {
+            let isValid = true;
+            let requiredFields = document.querySelectorAll("input[required], select[required]");
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    field.style.borderColor = "red";
+                    isValid = false;
+                } else {
+                    field.style.borderColor = "#ccc";
+                }
+            });
+
+            if (!isValid) {
+                document.getElementById("error-message").classList.remove("hidden");
+            }
+
+            return isValid;
+        }
+
+        function closeForm() {
+            window.close();
+        }
+
+        function togglePrintButton() {
+            document.getElementById("print-button").classList.remove("hidden");
+        }
+    </script>
+</head>
+<body>
+<h1>Реквизиты входящего документа</h1>
+<form action="/page/save-document" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+    <div class="form-group">
+        <label for="regNumber" class="required">Регистрационный №</label>
+        <input type="text" id="regNumber" name="regNumber" required>
+    </div>
+    <div class="form-group">
+        <label for="regDate" class="required">Дата регистрации</label>
+        <input type="date" id="regDate" name="regDate" required>
+    </div>
+    <div class="form-group">
+        <label for="outDocNumber">№ исходного документа</label>
+        <input type="text" id="outDocNumber" name="outDocNumber">
+    </div>
+    <div class="form-group">
+        <label for="outDocDate">Дата исходного документа</label>
+        <input type="date" id="outDocDate" name="outDocDate">
+    </div>
+    <div class="form-group">
+        <label for="deliveryMethod">Форма доставки</label>
+        <select id="deliveryMethod" name="deliveryMethod">
+            <option value="Курьер">Курьер</option>
+            <option value="Email">Email</option>
+            <option value="Телефонограмма">Телефонограмма</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="correspondent" class="required">Корреспондент</label>
+        <select id="correspondent" name="correspondent" required>
+            <option value="ЦБ">ЦБ</option>
+            <option value="ГНИ">ГНИ</option>
+            <option value="ТСЖ">ТСЖ</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="subject" class="required">Тема</label>
+        <input type="text" id="subject" name="subject" maxlength="100" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Описание</label>
+        <input type="text" id="description" name="description" maxlength="1000">
+    </div>
+    <div class="form-group">
+        <label for="dueDate">Срок исполнения</label>
+        <input type="date" id="dueDate" name="dueDate">
+    </div>
+    <div class="form-group">
+        <label for="access">Доступ</label>
+        <input type="checkbox" id="access" name="access">
+    </div>
+    <div class="form-group">
+        <label for="control">Контроль</label>
+        <input type="checkbox" id="control" name="control">
+    </div>
+    <div class="form-group">
+        <label for="file">Файл</label>
+        <input type="file" id="file" name="file">
+    </div>
+    <div class="form-actions">
+        <button type="submit">Сохранить</button>
+        <button type="button" onclick="closeForm()">Закрыть</button>
+        <button type="reset">Очистить</button>
+        <button type="button" th:classappend="${successMessage} ? '' : 'hidden'" onclick="window.print()">Печать</button>
+    </div>
+    <div id="error-message" class="error hidden">Заполните выделенные поля!</div>
+</form>
+</body>
+</html>
