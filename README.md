@@ -27,8 +27,9 @@ client_balance_value — значение баланса клиента.
 
 Что бы запустить проект, у вас должен быть установлен и запущен [docker](https://www.docker.com/). 
 После чего, необходимо выполнить следующие команды:
-1) Открыть командную строку в проекте и ввести: ```docker-compose -f docker-compose.yml up -d```.
-2) Открываем postman и можем выполнять rest запросы.
+1) Для начала необходимо клонировать репозиторий ```git clone https://github.com/divergenny/fido_web.git```
+2) Открыть командную строку в корневом проекте и ввести: ```docker-compose -f docker-compose.yml up -d```.
+3) Открываем postman и можем выполнять rest запросы.
 
 Запросы:
 1) POST - http://localhost:8080/api/documents/save
