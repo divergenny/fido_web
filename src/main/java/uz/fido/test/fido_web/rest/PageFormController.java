@@ -11,12 +11,14 @@ import uz.fido.test.fido_web.service.DocumentService;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/page")
-public class IndexController {
+public class PageFormController {
     private final DocumentService documentService;
 
-    @GetMapping("/")
-    public String showForm(Model model) {
-        model.addAttribute("document", new DocumentDTO());
+    @GetMapping
+    public String getForm(Model model) {
+        model.addAttribute("formName", "");
+        model.addAttribute("buttonStylePrintDisplay", "display:none");
+        model.addAttribute("documentFormData", new DocumentDTO());
         return "document-form";
     }
 
@@ -24,15 +26,19 @@ public class IndexController {
     public String saveDocument(@ModelAttribute DocumentDTO documentDTO,
                                @RequestParam(value = "file", required = false) MultipartFile file,
                                Model model) {
-        System.out.println(documentDTO);
-        String result = documentService.saveDocument(documentDTO, file);
-        if (result.equals("Документ сохранен успешно!")) {
-            model.addAttribute("successMessage", result);
-            model.addAttribute("document", documentDTO);
-            return "document-form";
-        } else {
-            model.addAttribute("errorMessage", result);
-            return "document-form";
+        if (null == documentDTO) {
+            return "redirect:/page";
         }
+        String result = documentService.saveDocument(documentDTO, file);
+        model.addAttribute("alertMessage", result);
+        model.addAttribute("documentFormData", documentDTO);
+        if (result.equals("Документ сохранен успешно!")) {
+            model.addAttribute("buttonStylePrintDisplay", "display:true");
+            model.addAttribute("typeOfResponseAlertMessage", "success");
+        } else {
+            model.addAttribute("typeOfResponseAlertMessage", "danger");
+            model.addAttribute("buttonStylePrintDisplay", "display:none");
+        }
+        return "document-form";
     }
 }
