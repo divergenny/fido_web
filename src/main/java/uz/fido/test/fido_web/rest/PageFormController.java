@@ -30,8 +30,12 @@ public class PageFormController {
             return "redirect:/page";
         }
         String result = documentService.saveDocument(documentDTO, file);
+        if (null != file) {
+            documentDTO.setFileUpload(file.getOriginalFilename());
+        }
         model.addAttribute("alertMessage", result);
         model.addAttribute("documentFormData", documentDTO);
+        model.addAttribute("nameOfFileUpload", documentDTO.getFileUpload());
         if (result.equals("Документ сохранен успешно!")) {
             model.addAttribute("buttonStylePrintDisplay", "display:true");
             model.addAttribute("typeOfResponseAlertMessage", "success");

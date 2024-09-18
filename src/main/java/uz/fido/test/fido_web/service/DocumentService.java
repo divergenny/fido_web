@@ -44,7 +44,7 @@ public class DocumentService {
                     .getPath("")
                     .toAbsolutePath()
                     .toString();
-            String uploadDir = userDirectory + "/uploads/";
+            String uploadDir = userDirectory + "\\uploads\\";
             File directory = new File(uploadDir + fileName);
             fileUpload = uploadDir + fileName;
             if (!directory.exists()) {
@@ -53,10 +53,8 @@ public class DocumentService {
             file.transferTo(directory);
         } catch (IOException e) {
             log.error("saveDocument" + e);
-            return "Ошибка сохранения файла.";
+            return "Ошибка сохранения файла, выберите файл снова.";
         }
-
-
         ObjectMapper objectMapper = new ObjectMapper();
         DocumentDTO documentDTO;
         try {
@@ -65,12 +63,10 @@ public class DocumentService {
                 JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
         checkRsl = documentServiceValidator.checkDocumentDTOConditions(documentDTO);
-        if (!checkRsl.equals("ok")) {
+        if (!checkRsl.isEmpty()) {
             return checkRsl;
         }
-
         IncomingDocument incomingDocument = new IncomingDocument();
         incomingDocument.setRegNumber(documentDTO.getRegNumber());
         incomingDocument.setRegDate(LocalDate.parse(documentDTO.getRegDate()));
@@ -101,7 +97,7 @@ public class DocumentService {
                     .getPath("")
                     .toAbsolutePath()
                     .toString();
-            String uploadDir = userDirectory + "/uploads/";
+            String uploadDir = userDirectory + "\\uploads\\";
             File directory = new File(uploadDir + fileName);
             fileUpload = uploadDir + fileName;
             if (!directory.exists()) {
@@ -114,7 +110,7 @@ public class DocumentService {
         }
 
         checkRsl = documentServiceValidator.checkDocumentDTOConditions(documentDTO);
-        if (!checkRsl.equals("ok")) {
+        if (!checkRsl.isEmpty()) {
             return checkRsl;
         }
 
@@ -149,9 +145,9 @@ public class DocumentService {
         return documentRepository.findAll();
     }
 
-    public IncomingDocument updateDocument(Long id,
-                                           String json,
-                                           MultipartFile file) {
+    public String updateDocument(Long id,
+                                 String json,
+                                 MultipartFile file) {
         ObjectMapper objectMapper = new ObjectMapper();
         DocumentDTO updatedDocumentDTO;
         try {
@@ -161,9 +157,8 @@ public class DocumentService {
             throw new RuntimeException(e);
         }
         String checkRsl = documentServiceValidator.checkDocumentDTOConditions(updatedDocumentDTO);
-        if (!checkRsl.equals("ok")) {
-            return null;
-            //return checkRsl;
+        if (!checkRsl.isEmpty()) {
+            return checkRsl;
         }
         Optional<IncomingDocument> existingDocument = documentRepository.findById(id);
         if (existingDocument.isPresent()) {
@@ -180,9 +175,9 @@ public class DocumentService {
             document.setAccess(updatedDocumentDTO.isAccess());
             document.setControl(updatedDocumentDTO.isControl());
             handleFileUpload(document, file);
-            return documentRepository.save(document);
+            return String.valueOf(documentRepository.save(document));
         }
-        return null;
+        return "Ошибка обновления";
     }
 
     public boolean deleteDocument(Long id) {

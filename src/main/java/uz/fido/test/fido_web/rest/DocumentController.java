@@ -47,18 +47,20 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<IncomingDocument> updateDocument(@PathVariable Long id,
-                                                           @RequestParam(value = "data") String json,
-                                                           @RequestParam(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<String> updateDocument(@PathVariable Long id,
+                                                 @RequestParam(value = "data") String json,
+                                                 @RequestParam(value = "file", required = false) MultipartFile file) {
+
+
         try {
-            IncomingDocument updatedDocument = documentService.updateDocument(id, json, file);
-            if (updatedDocument != null) {
-                return ResponseEntity.ok(updatedDocument);
+            String result = documentService.updateDocument(id, json, file);
+            if (result.equals("Документ сохранен успешно!")) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(result);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Что то пошло не так:" + e);
         }
     }
 

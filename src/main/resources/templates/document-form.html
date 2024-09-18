@@ -124,6 +124,8 @@
     <div class="form-group mb-3">
         <label for="file" class="form-label">Выберите файл</label>
         <input class="form-control" type="file" id="file" name="file">
+        <input th:style="${buttonStylePrintDisplay}" class="form-control" type="text" id="uploadedFileName"
+               name="uploadedFileName" th:value="${nameOfFileUpload}" readonly>
     </div>
     <div class="form-actions">
         <button type="submit" th:attr="data-alert-message=${alertMessage}" class="save-button btn btn-primary">Сохранить
@@ -161,13 +163,9 @@
                 offset: {from: 'top', amount: 100}, // Положение уведомления (уменьшена высота, чтобы сообщение было ближе к пользователю)
                 align: 'center', // Выравнивание по центру экрана
                 width: 'auto', // Автоматическая ширина, чтобы охватить все сообщение
-                delay: 15000, // Увеличенная задержка на 7 секунд для лучшего восприятия
+                delay: 7000, // Увеличенная задержка на 7 секунд для лучшего восприятия
                 allow_dismiss: true, // Включена возможность закрытия
-                stackup_spacing: 15, // Расстояние между сообщениями, если их несколько
-                animate: {
-                    enter: 'animated fadeInDown', // Анимация появления
-                    exit: 'animated fadeOutUp'    // Анимация исчезновения
-                }
+                stackup_spacing: 10, // Расстояние между сообщениями, если их несколько
             });
         }
     </script>

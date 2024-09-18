@@ -17,11 +17,12 @@ public class DocumentServiceValidator {
      * @return result;
      */
     public String checkFileConditions(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
+            return "Выберите файл";
+        } else {
             String fileName = file.getOriginalFilename();
             boolean extensionOfFile = !fileName.endsWith(".pdf") && !fileName.endsWith(".doc") && !fileName.endsWith(".docx");
             boolean sizeOfFile = file.getSize() > 1048576;
-
             if (extensionOfFile && sizeOfFile) {
                 return "Недопустимый формат и размер файла";
             } else if (extensionOfFile) {
@@ -34,44 +35,53 @@ public class DocumentServiceValidator {
     }
 
     public String checkDocumentDTOConditions(DocumentDTO documentDTO) {
+        StringBuilder responseBuilder = new StringBuilder();
+        int index = 0;
+
         if (documentDTO.getRegNumber().isEmpty()
                 || documentDTO.getRegDate() == null
                 || documentDTO.getCorrespondent().isEmpty()
                 || documentDTO.getSubject().isEmpty()) {
-            return "Заполните выделенные поля!";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Проверьте поля: Регистрационный №, Дата регистрации, Корреспондент, Тема.");
         }
         if (!Pattern.matches("^(?=.*[0-9])[0-9a-zA-Z\\p{Punct}]+$", documentDTO.getRegNumber())) {
-            return "Рег. № должен содержать цифры и буквы или специальные символы, и не может состоять только из букв или специальных символов";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Регистрационный № должен содержать цифры и буквы или специальные символы, и не может состоять только из букв или специальных символов");
         }
         LocalDate regDate = LocalDate.parse(documentDTO.getRegDate());
         if (!regDate.equals(LocalDate.now())) {
-            return "Дата рег. должна быть текущей датой";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Дата регистрации должна быть текущей датой");
         }
         if (documentDTO.getOutDocNumber() != null
                 && !documentDTO.getOutDocNumber().isEmpty()) {
             if (!Pattern.matches("^(?=.*[0-9])[0-9a-zA-Z\\p{Punct}]+$", documentDTO.getOutDocNumber())) {
-                return "№ исх. док-та должен содержать цифры и буквы или специальные символы, и не может состоять только из букв или специальных символов";
+                index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Номер исходного документа должен содержать цифры и буквы или специальные символы, и не может состоять только из букв или специальных символов");
             }
         }
         String deliveryMethod = documentDTO.getDeliveryMethod();
-        if (!deliveryMethod.equals("Courier") && !deliveryMethod.equals("Email") && !deliveryMethod.equals("Phonegram")) {
-            return "Форма доставки должна быть одной из: Курьер, Email, Телефонограмма";
+        if (!deliveryMethod.equals("Курьер") && !deliveryMethod.equals("Email") && !deliveryMethod.equals("Телефонограмма")) {
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Форма доставки должна быть одной из: Курьер, Email, Телефонограмма");
         }
         String correspondent = documentDTO.getCorrespondent();
         if (!correspondent.equals("ЦБ") && !correspondent.equals("ГНИ") && !correspondent.equals("ТСЖ")) {
-            return "Корреспондент должен быть одним из: ЦБ, ГНИ, ТСЖ";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Корреспондент должен быть одним из: ЦБ, ГНИ, ТСЖ");
         }
         if (documentDTO.getSubject().length() > 100) {
-            return "Тема не может быть длиннее 100 знаков";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Тема не может быть длиннее 100 знаков");
         }
         if (documentDTO.getDescription() != null
                 && documentDTO.getDescription().length() > 1000) {
-            return "Описание не может быть длиннее 1000 знаков";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Описание не может быть длиннее 1000 знаков");
         }
         LocalDate dueDate = LocalDate.parse(documentDTO.getDueDate());
         if (dueDate.isBefore(regDate)) {
-            return "Срок исполнения не может быть раньше даты регистрации документа";
+            index = formCheckDocumentDTOConditionsResponse(responseBuilder, index, "Срок исполнения не может быть раньше даты регистрации документа");
         }
-        return "ok";
+        return responseBuilder.toString();
+    }
+
+    private int formCheckDocumentDTOConditionsResponse(StringBuilder responseBuilder, int index, String message) {
+        index++;
+        responseBuilder.append("\n").append(index).append(") ").append(message);
+        return index;
     }
 }
